@@ -1,3 +1,10 @@
+// Literal first import -- must run, including require-in-the-middle's
+// module-patching hook installation, before `./app` pulls in express (see
+// mfe-pot-platform/CLAUDE.md's observability section for why the ordering
+// matters). Instrumenting undici here matters specifically for this BFF:
+// its own fan-out to job-bank-bff/employment-insurance-bff (overview.ts)
+// uses the native fetch API, not http.request.
+import '@tn4consulting/shared-observability-server/register';
 import { createApp } from './app';
 
 const host = process.env.HOST ?? 'localhost';

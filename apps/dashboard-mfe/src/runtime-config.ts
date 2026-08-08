@@ -1,4 +1,5 @@
 import { fetchRuntimeConfig } from '@tn4consulting/shared-runtime-config';
+import { initBrowserObservability } from '@tn4consulting/shared-observability';
 
 /**
  * Replaces environment.ts/environment.prod.ts + fileReplacements -- see
@@ -17,8 +18,26 @@ import { fetchRuntimeConfig } from '@tn4consulting/shared-runtime-config';
 const devDefaults = {
   strapiBaseUrl: 'http://localhost:1337',
   dashboardBffBaseUrl: 'http://localhost:3004',
+  // undefined -- no local collector needed for plain `nx serve`, see
+  // shared-observability's initBrowserObservability.
+  otelExporterOtlpEndpoint: undefined as string | undefined,
 };
 
-export function loadRuntimeConfig(ownOriginUrl: string) {
-  return fetchRuntimeConfig(ownOriginUrl, devDefaults);
+export async function loadRuntimeConfig(ownOriginUrl: string) {
+  const config = await fetchRuntimeConfig(ownOriginUrl, devDefaults);
+  // Single wiring point for every exposed entry point in this app (App.tsx,
+  // PaymentHistory.tsx as a standalone widget, ...) -- all funnel through
+  // this same function. Idempotent, so calling it more than once per
+  // session is safe -- this app exposes both ./Component and
+  // ./PaymentHistoryWidget, so it genuinely can be called twice.
+  // propagateTraceHeaderCorsUrls matches this app's own BFF Ingress origin
+  // on any environment -- see mfe-pot-platform/CLAUDE.md's observability
+  // section for why this is required, not optional, for a federated
+  // remote's BFF calls.
+  initBrowserObservability({
+    serviceName: 'dashboard-mfe',
+    otlpEndpoint: config.otelExporterOtlpEndpoint,
+    propagateTraceHeaderCorsUrls: [/^https?:\/\/dashboard-mfe\./],
+  });
+  return config;
 }
