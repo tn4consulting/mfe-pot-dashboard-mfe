@@ -10,7 +10,7 @@ The **MSCA-D** frontend for the mfe-pot Government of Canada MFE
 proof-of-technology: cross-benefit overview, payment history, correspondence,
 and "tell us once" profile maintenance. Federated as a remote into
 `mfe-pot-msca-shell`; also exposes a standalone payment-history widget
-embedded into `mfe-pot-employment-life-events`.
+embedded into `mfe-pot-life-events`.
 
 This README covers running **this app (+ its BFF) standalone**. For the full
 family (all 7 repos together) and architecture rationale, see

@@ -2,7 +2,7 @@
 
 ## What this is
 
-The **MSCA-D** frontend for the mfe-pot Government of Canada MFE proof-of-technology: 360° cross-benefit overview (eligible benefits, active applications, "my tasks"), payment history, correspondence, and "tell us once" profile maintenance. Federated as a remote into `mfe-pot-msca-shell`; also exposes a standalone payment-history widget embedded directly into `mfe-pot-employment-life-events-mfe`, and embeds job-bank's job-applications widget and employment-insurance's EI-reporting-status widget in its own overview (host-mediated via `mfe-pot-msca-shell` — see the platform repo's CLAUDE.md "Federation" section) — the one app in the family that's both a widget *source* and a widget *consumer*.
+The **MSCA-D** frontend for the mfe-pot Government of Canada MFE proof-of-technology: 360° cross-benefit overview (eligible benefits, active applications, "my tasks"), payment history, correspondence, and "tell us once" profile maintenance. Federated as a remote into `mfe-pot-msca-shell`; also exposes a standalone payment-history widget embedded directly into `mfe-pot-life-events-mfe`, and embeds job-bank's job-applications widget and employment-insurance's EI-reporting-status widget in its own overview (host-mediated via `mfe-pot-msca-shell` — see the platform repo's CLAUDE.md "Federation" section) — the one app in the family that's both a widget *source* and a widget *consumer*.
 
 @docs/PLATFORM_STANDARDS.md
 

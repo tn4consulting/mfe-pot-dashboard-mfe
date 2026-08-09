@@ -28,7 +28,7 @@ const VISUALLY_HIDDEN_STYLE: React.CSSProperties = {
 };
 
 /**
- * Exposed as `./PaymentHistoryWidget` for employment-life-events to embed,
+ * Exposed as `./PaymentHistoryWidget` for life-events to embed,
  * and also rendered inline on dashboard's own overview -- either way it's
  * fully self-configuring (fetches its own runtime config, builds its own
  * API client), since there's no host-provided REMOTE_PROVIDERS equivalent
@@ -116,7 +116,7 @@ export function DashboardFeaturePaymentHistory() {
     // Inline styles, not a stylesheet class -- same federation-survival
     // reasoning as Overview.tsx's own comment: this widget renders both
     // standalone (dashboard's own overview) and embedded remotely
-    // (employment-life-events), and its own styles.css never loads in
+    // (life-events), and its own styles.css never loads in
     // either federated case. The card look (white background, border,
     // radius, persistent shadow) mirrors dashboard.png's "Payments
     // Activity" card, and matches scds-card's own visual treatment
