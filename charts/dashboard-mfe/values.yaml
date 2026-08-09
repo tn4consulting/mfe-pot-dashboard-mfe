@@ -1,6 +1,13 @@
 frontend:
   name: dashboard-mfe
+  # Generalizing the pattern proved live on employment-insurance-mfe --
+  # see mfe-pot/TODO.md's "Design principles" section, principles 3/4.
+  # Local kind default stays at 1 (limits resource pressure on a
+  # single-node dev cluster) -- values-eks.yaml bumps this to 2.
   replicaCount: 1
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
   image:
     repository: mfe-pot-dashboard-mfe
     tag: latest
@@ -9,11 +16,11 @@ frontend:
   servicePort: 80
   # dashboardBffBaseUrl is same-origin (this app's own BFF, via
   # the /api Ingress path rule below) -- see CLAUDE.md's Hosting section.
-  # Empty, not "/api": HttpBenefitOverviewApiClient/HttpPaymentHistoryApiClient
-  # already append "/api/..." themselves (`${baseUrl}/api/overview`), so
-  # this value is just "this app's own origin" -- shared-runtime-config's
-  # fetchRuntimeConfig resolves "" to that origin. A literal "/api" here
-  # double-prefixes every request to /api/api/... and 404s.
+  # Empty, not "/api": HttpPaymentHistoryApiClient already appends
+  # "/api/..." itself (`${baseUrl}/api/payments`), so this value is just
+  # "this app's own origin" -- shared-runtime-config's fetchRuntimeConfig
+  # resolves "" to that origin. A literal "/api" here double-prefixes every
+  # request to /api/api/... and 404s.
   # strapiBaseUrl now points at charts/strapi's real public Ingress
   # hostname (mfe-pot-platform), not in-cluster Service DNS -- this call
   # is browser-to-server (ContentClient fetches Strapi directly from the
@@ -27,27 +34,41 @@ frontend:
     # with backend.env's OTEL_EXPORTER_OTLP_ENDPOINT below) -- see
     # mfe-pot-platform/charts/otel-collector.
     otelExporterOtlpEndpoint: "http://otel.mfe-pot.local"
+    # Unleash's own Frontend API, browser-reachable -- see
+    # mfe-pot-platform/charts/unleash. Gates the job-applications/
+    # ei-reporting-status cross-domain widgets on Overview.tsx (see
+    # mfe-pot/TODO.md's "Design principles" section, principle 6). The
+    # token is a FRONTEND-type Unleash token, not the CLIENT-type token
+    # dashboard-bff would use if it read flags -- see
+    # charts/unleash/values.yaml's comment on why these aren't
+    # interchangeable.
+    unleashFrontendApiUrl: "http://unleash.mfe-pot.local/api/frontend"
+    unleashFrontendApiToken: "*:development.unleash-demo-frontend-token"
 
 backend:
   name: dashboard-bff
+  # 1 on kind, 2 on EKS (values-eks.yaml) -- see frontend.replicaCount above.
   replicaCount: 1
+  readinessPath: /ready
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
   image:
     repository: mfe-pot-dashboard-bff
     tag: latest
     pullPolicy: IfNotPresent
   containerPort: 3004
   servicePort: 3004
-  # JOB_BANK_BFF_URL/EMPLOYMENT_INSURANCE_BFF_URL point at real sibling
-  # Helm releases' in-cluster Services (job-bank-bff, employment-insurance-bff
-  # -- each already a Deployment+Service pair from its own extracted
-  # repo's chart), not their public Ingress hostnames -- this is genuine
-  # cluster-internal service-to-service traffic. Payments/correspondence are
-  # served from dashboard-bff's own local data (data.ts), so /api/payments
-  # and /api/overview's payments/correspondence tiles no longer depend on
-  # any upstream being deployed.
+  # dashboard-bff never calls another BFF (see mfe-pot/TODO.md's "Design
+  # principles" section, principle 2) -- payments/correspondence are served
+  # entirely from its own local data (data.ts). It used to also proxy
+  # job-bank-bff/employment-insurance-bff (JOB_BANK_BFF_URL/
+  # EMPLOYMENT_INSURANCE_BFF_URL, feeding the now-deleted /api/overview);
+  # that cross-domain content is composed in the browser instead now, via
+  # the widget-loader (see dashboard-mfe's Overview.tsx).
   # REDIS_URL points at mfe-pot-platform's charts/session-cache release --
-  # a third, separate cross-Helm-release in-cluster Service, same kind of
-  # traffic as the two BFF URLs above.
+  # a cross-Helm-release in-cluster Service, same kind of traffic as
+  # MOCK_IDP_JWKS_URL/MOCK_IDP_ISSUER below.
   # MOCK_IDP_JWKS_URL/MOCK_IDP_ISSUER point at mfe-pot-platform's
   # charts/mock-idp release's own in-cluster Service DNS -- server-to-server
   # JWT verification traffic, same pattern as the other cross-Helm-release
@@ -56,8 +77,6 @@ backend:
   env:
     HOST: "0.0.0.0"
     PORT: "3004"
-    JOB_BANK_BFF_URL: "http://job-bank-bff.default.svc.cluster.local:3001"
-    EMPLOYMENT_INSURANCE_BFF_URL: "http://employment-insurance-bff.default.svc.cluster.local:3002"
     REDIS_URL: "redis://session-cache.default.svc.cluster.local:6379"
     MOCK_IDP_JWKS_URL: "http://mock-idp.default.svc.cluster.local:3005/.well-known/jwks.json"
     MOCK_IDP_ISSUER: "http://mock-idp.default.svc.cluster.local:3005"

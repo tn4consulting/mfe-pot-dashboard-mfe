@@ -1,4 +1,5 @@
 import { fetchRuntimeConfig } from '@tn4consulting/shared-runtime-config';
+import { initBrowserFeatureFlags } from '@tn4consulting/shared-feature-flags';
 import { initBrowserObservability } from '@tn4consulting/shared-observability';
 
 /**
@@ -21,6 +22,11 @@ const devDefaults = {
   // undefined -- no local collector needed for plain `nx serve`, see
   // shared-observability's initBrowserObservability.
   otelExporterOtlpEndpoint: undefined as string | undefined,
+  // undefined -- no local Unleash needed for plain `nx serve`, same posture
+  // as otelExporterOtlpEndpoint above; useFeatureFlag falls back to its own
+  // `fallback` argument when unset.
+  unleashFrontendApiUrl: undefined as string | undefined,
+  unleashFrontendApiToken: '',
 };
 
 export async function loadRuntimeConfig(ownOriginUrl: string) {
@@ -38,6 +44,11 @@ export async function loadRuntimeConfig(ownOriginUrl: string) {
     serviceName: 'dashboard-mfe',
     otlpEndpoint: config.otelExporterOtlpEndpoint,
     propagateTraceHeaderCorsUrls: [/^https?:\/\/dashboard-mfe\./],
+  });
+  initBrowserFeatureFlags({
+    appName: 'dashboard-mfe',
+    frontendApiUrl: config.unleashFrontendApiUrl,
+    frontendApiToken: config.unleashFrontendApiToken,
   });
   return config;
 }

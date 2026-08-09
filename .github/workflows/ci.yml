@@ -56,6 +56,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Enforces the BFF/UI call-boundary design principles -- see
+      # mfe-pot/TODO.md's "Design principles" section and
+      # docs/PLATFORM_STANDARDS.md's "BFF boundary rules".
+      - name: Check BFF/UI call boundaries
+        run: pnpm run check:boundaries
+
       - name: Lint, test, build
         run: pnpm exec nx run-many -t lint,test,build --all
 
@@ -72,14 +78,11 @@ jobs:
   # kind-based validation stage from CLAUDE.md's Hosting section, now
   # automated instead of the one-off manual run it started as.
   #
-  # Note: this is a single-app-repo deploy, not the full cluster. dashboard's
-  # own chart deploys cleanly on its own, but dashboard-bff's calls to
-  # job-bank-bff/employment-insurance-bff (real in-cluster Service DNS --
-  # see CLAUDE.md) have nothing to resolve here, since this workflow doesn't
-  # also deploy those other apps' charts.
-  # That's fine for this stage's purpose (proving *this* image/chart pair
-  # builds, deploys, and serves) -- the /api/overview smoke check below
-  # deliberately avoids depending on those upstreams being reachable.
+  # Note: this is a single-app-repo deploy, not the full cluster. dashboard-bff
+  # never calls another BFF (see mfe-pot/TODO.md's "Design principles"
+  # section) -- it only serves its own local payments/correspondence data --
+  # so this single-app deploy has everything dashboard-bff itself needs to
+  # actually serve real (not just reachable) responses, unlike before.
   kind-validation:
     needs: lint-test-build
     runs-on: ubuntu-latest
@@ -164,11 +167,9 @@ jobs:
       # plan doc): the frontend actually serves, the ConfigMap-injected
       # runtime config round-tripped (not the image's {} placeholder),
       # and the BFF is reachable through the same Ingress via /api. Hits
-      # /api/overview with no `sub` query param deliberately -- asserts a
-      # real 400 validation-error response (not a 404), proving the
-      # request actually reached the Express app without depending on
-      # job-bank-bff/employment-insurance-bff being deployed in this
-      # single-app workflow (see the job comment above).
+      # /api/correspondence with no `sub` query param deliberately --
+      # asserts a real 400 validation-error response (not a 404), proving
+      # the request actually reached the Express app.
       - name: Verify the deployed app is actually reachable
         run: |
           set -eu
@@ -182,7 +183,7 @@ jobs:
           done
           curl -sf -H "Host: dashboard-mfe.mfe-pot.local" http://localhost/ | grep -qi '<script src="env.js">'
           curl -sf -H "Host: dashboard-mfe.mfe-pot.local" http://localhost/env.js | grep -q '"dashboardBffBaseUrl":""'
-          status=$(curl -s -o /dev/null -w '%{http_code}' -H "Host: dashboard-mfe.mfe-pot.local" "http://localhost/api/overview")
+          status=$(curl -s -o /dev/null -w '%{http_code}' -H "Host: dashboard-mfe.mfe-pot.local" "http://localhost/api/correspondence")
           [ "$status" = "400" ]
 
   # Stage 2: build+push real images to ECR and deploy to the real AWS EKS

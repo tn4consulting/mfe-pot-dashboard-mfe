@@ -22,11 +22,14 @@ interface RemoteConfig {
  * Auth/claim check lives here, not in the feature components -- defense
  * in depth, this app validates its own claim independently.
  *
- * No longer fetches dashboard-bff's `/api/overview` (benefitOverview) --
- * its only frontend consumer was Overview.tsx's "My Tasks" section, which
- * was dropped (see Overview.tsx's own comment). dashboard-bff's
- * `getBenefitOverview` fan-out itself is untouched -- it's still real,
- * still tested, just no longer called from this page.
+ * dashboard-bff no longer has an `/api/overview` endpoint at all --
+ * its `getBenefitOverview` server-to-server fan-out to job-bank-bff/
+ * employment-insurance-bff was deleted outright (see mfe-pot/TODO.md's
+ * "Design principles" section, principle 2: BFFs must not call each
+ * other). Its only frontend consumer was Overview.tsx's "My Tasks"
+ * section, already dropped before this; the two cross-domain widgets it
+ * also used to feed are back, restored the compliant way (host-mediated
+ * browser composition, see Overview.tsx's own comment).
  */
 export function App() {
   const [hasAccess, setHasAccess] = useState(() => hasClaim(getStoredSession(), CLAIM_DASHBOARD));

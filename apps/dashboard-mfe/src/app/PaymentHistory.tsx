@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { getStoredSession } from '@tn4consulting/shared-auth/core';
 import type { ContentClient, PageContent } from '@tn4consulting/shared-content-client';
 import { useLocale } from '@tn4consulting/shared-i18n';
+import { withRemoteParent } from '@tn4consulting/shared-observability';
 import type { Payment, PaymentHistoryApiClient } from 'dashboard-data-access';
 import { HttpPaymentHistoryApiClient } from 'dashboard-data-access';
 import { createContentClient, PAYMENT_HISTORY_CONTENT_KEYS } from './content-client';
@@ -36,7 +37,19 @@ const VISUALLY_HIDDEN_STYLE: React.CSSProperties = {
  * `DashboardFeaturePaymentHistory` -- because mfe-pot-shell's routes.tsx
  * already resolves the widget module by this name.
  */
-export function DashboardFeaturePaymentHistory() {
+export interface DashboardFeaturePaymentHistoryProps {
+  /**
+   * A serialized W3C traceparent from the composing page's own root span
+   * (see @tn4consulting/shared-observability's startPageSpan), so this
+   * widget's own fetch joins that trace instead of starting a disconnected
+   * one -- see Overview.tsx's own comment. Optional and harmless when
+   * absent (life-events-mfe's WidgetSlot renders this with no props at
+   * all) -- withRemoteParent no-ops on undefined.
+   */
+  parentTraceparent?: string;
+}
+
+export function DashboardFeaturePaymentHistory({ parentTraceparent }: DashboardFeaturePaymentHistoryProps = {}) {
   const [apiClient, setApiClient] = useState<PaymentHistoryApiClient | null>(null);
   const [contentClient, setContentClient] = useState<ContentClient | null>(null);
   const [content, setContent] = useState<Record<string, PageContent>>({});
@@ -94,8 +107,7 @@ export function DashboardFeaturePaymentHistory() {
       return;
     }
     let cancelled = false;
-    apiClient
-      .getPayments(session.sub)
+    withRemoteParent(parentTraceparent, () => apiClient.getPayments(session.sub))
       .then((result) => {
         if (!cancelled) {
           setPayments(result);
@@ -110,7 +122,7 @@ export function DashboardFeaturePaymentHistory() {
     return () => {
       cancelled = true;
     };
-  }, [apiClient]);
+  }, [apiClient, parentTraceparent]);
 
   return (
     // Inline styles, not a stylesheet class -- same federation-survival

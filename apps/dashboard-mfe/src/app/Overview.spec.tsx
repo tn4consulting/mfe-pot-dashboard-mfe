@@ -1,19 +1,31 @@
 import * as React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { clearSession, createMockSession, storeSession } from '@tn4consulting/shared-auth/core';
+import {
+  RemoteModuleLoaderContext,
+  WidgetRegistryContext,
+} from '@tn4consulting/shared-federation-runtime';
+import { UnleashClient } from 'unleash-proxy-client';
+import {
+  __resetBrowserFeatureFlagsForTests,
+  initBrowserFeatureFlags,
+} from '@tn4consulting/shared-feature-flags';
 import { Overview } from './Overview';
 
 jest.mock('./register-scds', () => ({}));
 jest.mock('./asset-base-url', () => ({ assetBaseUrl: 'http://localhost:4201/' }));
+jest.mock('unleash-proxy-client', () => ({ UnleashClient: jest.fn() }));
 
 // Overview renders DashboardFeaturePaymentHistory (the "Payments Activity"
 // widget) directly, alongside NeedsAttentionList, matching the two-column
 // layout in docs/msca-screenshots/dashboard.png -- same runtime-config/
 // content-client/fetch mocking PaymentHistory.spec.tsx and App.spec.tsx
-// already need for that widget. Overview no longer renders "My Tasks" or
-// the job-bank/employment-insurance federated widgets -- see Overview.tsx's
-// own comment on why (none of the three appear in the reference
-// screenshot; the two widgets moved to their owning apps' own pages).
+// already need for that widget. Overview also renders two cross-domain
+// widget tiles (job-bank's JobApplicationsList, employment-insurance's
+// ReportingStatus) behind the dashboard-overview-cross-domain-widgets flag
+// -- see the second describe block below and Overview.tsx's own comment.
+// "My Tasks" stays dropped for good (no owning page, content was always a
+// restatement of signals ReportingStatus already surfaces).
 jest.mock('../runtime-config', () => ({
   loadRuntimeConfig: jest.fn().mockResolvedValue({ dashboardBffBaseUrl: 'http://localhost:3004', strapiBaseUrl: undefined }),
 }));
@@ -84,5 +96,76 @@ describe('Overview', () => {
     // see mfe-pot-platform/CLAUDE.md's i18n section on why this must be
     // findByText, not a synchronous getByText.
     expect(await screen.findByText('Hello, Jordan Tremblay')).toBeInTheDocument();
+  });
+
+  it('does not render the cross-domain widget tiles when the flag is off (the default)', async () => {
+    storeSession(createMockSession());
+    const loadRemoteModule = jest.fn();
+    render(
+      <RemoteModuleLoaderContext.Provider value={loadRemoteModule}>
+        <Overview contentClient={overviewContentClient} />
+      </RemoteModuleLoaderContext.Provider>,
+    );
+
+    await screen.findByText('Hello, Jordan Tremblay');
+    expect(loadRemoteModule).not.toHaveBeenCalled();
+  });
+
+  describe('with dashboard-overview-cross-domain-widgets on', () => {
+    beforeEach(() => {
+      __resetBrowserFeatureFlagsForTests();
+      (UnleashClient as jest.Mock).mockReset();
+    });
+
+    it('renders both cross-domain widget tiles, loaded via the shell-mediated widget registry', async () => {
+      const isEnabled = jest.fn().mockReturnValue(true);
+      (UnleashClient as jest.Mock).mockImplementation(() => ({
+        start: jest.fn().mockResolvedValue(undefined),
+        isEnabled,
+        on: jest.fn(),
+        off: jest.fn(),
+      }));
+      initBrowserFeatureFlags({
+        appName: 'dashboard-mfe',
+        frontendApiUrl: 'http://unleash.mfe-pot.local/api/frontend',
+        frontendApiToken: 'test-token',
+      });
+
+      const loadRemoteModule = jest.fn().mockImplementation((remoteName: string) =>
+        Promise.resolve(
+          remoteName === 'job-bank-mfe'
+            ? { JobApplicationsList: () => <p>job applications widget</p> }
+            : { ReportingStatus: () => <p>ei reporting status widget</p> },
+        ),
+      );
+
+      storeSession(createMockSession());
+      render(
+        <RemoteModuleLoaderContext.Provider value={loadRemoteModule}>
+          <WidgetRegistryContext.Provider
+            value={{
+              'job-applications': {
+                remoteName: 'job-bank-mfe',
+                exposedModule: './JobApplicationsWidget',
+                exportName: 'JobApplicationsList',
+              },
+              'ei-reporting-status': {
+                remoteName: 'employment-insurance-mfe',
+                exposedModule: './EiReportingStatusWidget',
+                exportName: 'ReportingStatus',
+              },
+            }}
+          >
+            <Overview contentClient={overviewContentClient} />
+          </WidgetRegistryContext.Provider>
+        </RemoteModuleLoaderContext.Provider>,
+      );
+
+      await screen.findByText('Hello, Jordan Tremblay');
+      await waitFor(() => expect(screen.getByText('job applications widget')).toBeInTheDocument());
+      expect(screen.getByText('ei reporting status widget')).toBeInTheDocument();
+      expect(loadRemoteModule).toHaveBeenCalledWith('job-bank-mfe', './JobApplicationsWidget');
+      expect(loadRemoteModule).toHaveBeenCalledWith('employment-insurance-mfe', './EiReportingStatusWidget');
+    });
   });
 });

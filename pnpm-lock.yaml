@@ -26,18 +26,21 @@ importers:
       '@tn4consulting/shared-content-client':
         specifier: ^0.3.0
         version: 0.3.0
+      '@tn4consulting/shared-feature-flags':
+        specifier: ^0.1.0
+        version: 0.1.0(react@19.2.8)
       '@tn4consulting/shared-federation-config':
         specifier: ^0.7.0
         version: 0.7.0(@softarc/native-federation@4.3.2(typescript@6.0.3))
       '@tn4consulting/shared-federation-runtime':
-        specifier: ^1.0.2
-        version: 1.0.2(react@19.2.8)
+        specifier: ^2.0.0
+        version: 2.0.0(react@19.2.8)
       '@tn4consulting/shared-i18n':
         specifier: ^1.1.0
         version: 1.1.0(react@19.2.8)
       '@tn4consulting/shared-observability':
-        specifier: ^0.1.1
-        version: 0.1.1
+        specifier: ^0.2.0
+        version: 0.2.0
       '@tn4consulting/shared-observability-server':
         specifier: ^0.1.1
         version: 0.1.1(@opentelemetry/core@2.10.0(@opentelemetry/api@1.9.1))
@@ -112,8 +115,8 @@ importers:
         specifier: ^14.6.1
         version: 14.6.3(@testing-library/dom@10.4.1)
       '@tn4consulting/shared-platform-standards':
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.2.0
+        version: 0.2.0
       '@types/cors':
         specifier: ^2.8.19
         version: 2.8.19
@@ -2828,13 +2831,18 @@ packages:
   '@tn4consulting/shared-content-client@0.3.0':
     resolution: {integrity: sha512-FqetYnnYnC/VSBocxHS2p9q7xLBv8O/P6TqK/3mT39HRwqGzaK2GRVgmAPDIOXYjK1EcHixIzD/FEupQh6ZuiA==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-content-client/0.3.0/ce7fab8fb3b3c0337012c93ad09b8dea800ebe42}
 
+  '@tn4consulting/shared-feature-flags@0.1.0':
+    resolution: {integrity: sha512-pLQqp434ZtAVJ4AeG5shvoBWt43PomHTX1lKHUwAXsY2RRI7/vdHtdOS3iFD9cJ5bEAQSNSwCXHNgH5TmLaZNA==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-feature-flags/0.1.0/92339724170521ab0d95ad07c3d0829dccc977d8}
+    peerDependencies:
+      react: '>=19.0.0'
+
   '@tn4consulting/shared-federation-config@0.7.0':
     resolution: {integrity: sha512-B9dpO/7aTI1DAG6n6JIT0enRnN2Ed5JW8Uenf0yJ33KsqBk110y00wQ0IwPdHmK4AtNCjXTxkjc5k0DC52odJQ==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-federation-config/0.7.0/cc5f427dd6e229755d41b36e81783559e1b988a8}
     peerDependencies:
       '@softarc/native-federation': '>=4.0.0'
 
-  '@tn4consulting/shared-federation-runtime@1.0.2':
-    resolution: {integrity: sha512-CvupDBqGDkVD4NirwXa9vBwnMe/6J6UOJ4gV9r+8xamDVVANDmONh2KgCxA0yibTC0FKnUz445VoSbySmiDsiQ==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-federation-runtime/1.0.2/d1b7050eb14e1608f2e4d88ed646b5971777a5b3}
+  '@tn4consulting/shared-federation-runtime@2.0.0':
+    resolution: {integrity: sha512-2Y5EjRo7TchK+MinTcoKeeDcERgjZgI+kT9k3DIc0LhpaeTukl1/OYRJkKv1xxyev4qZbJ95xePQKzt+FabSjg==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-federation-runtime/2.0.0/2b7cea9779a2484e5661e3b66ee55d734109d3ae}
     peerDependencies:
       react: '>=19.0.0'
 
@@ -2846,11 +2854,11 @@ packages:
   '@tn4consulting/shared-observability-server@0.1.1':
     resolution: {integrity: sha512-tJCMFhwFqcS/vqYitCYoy2uks8OkftAwr5wdETSBiwaVaRgWpzQlDJWeCIoel/knUN5rormJhvXZgAxPzMSF+Q==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-observability-server/0.1.1/9939f77451accf9690442850106323bb2f0d43e3}
 
-  '@tn4consulting/shared-observability@0.1.1':
-    resolution: {integrity: sha512-V4RUq8KMEoktRgz0olN9c++/2vB61cDghR9fiJPTquuFBuTEx9OaBgS5xjYxbKuFAJlfAqS6OuD40m3pEBF9eg==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-observability/0.1.1/263d6dd86869dcffe9f8c242b6a062779eec1106}
+  '@tn4consulting/shared-observability@0.2.0':
+    resolution: {integrity: sha512-PlPTRFO6IIhh1vUixZzg2V1FJAe+lZGqu2pZYLjE23/cCnSiWVeW44I4iDjOdsiCbPmg0x5vdk1UmojT/fiheA==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-observability/0.2.0/c430333f0504756b324e87c47889046bb37e21e8}
 
-  '@tn4consulting/shared-platform-standards@0.1.0':
-    resolution: {integrity: sha512-e9Mb3svmsApdNB/ZgX/ynWBzU5T7omiFDfvVB1b8mthZZ+M4q9zmWgEwMlcGB7YUgseiQpVFQxuVAH9WDp19yA==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-platform-standards/0.1.0/6054b9b23939e0ab1014ba441ef9c5544555c101}
+  '@tn4consulting/shared-platform-standards@0.2.0':
+    resolution: {integrity: sha512-kRz2MNTx8p/ZSVeTuwGG6J1k6cPy7+Ktgoy74z/nh7oKMQ6eZcCk2iftlBXi5I+jPmsxSBJm3obqgCwTbq654w==, tarball: https://npm.pkg.github.com/download/@tn4consulting/shared-platform-standards/0.2.0/b64e4a6183a05887d541d4dde837ceb86e9a1f9b}
     hasBin: true
 
   '@tn4consulting/shared-runtime-config@0.1.4':
@@ -6683,6 +6691,9 @@ packages:
     resolution: {integrity: sha512-cAGWPIyOHU6zlmg88jwm7VRyXnMN7iV68OGAbYDk/Mh/xC/pzVPlQtY6ngoIH/5/tciuhGfvESU8GrHrcxD56w==}
     engines: {node: '>=8'}
 
+  tiny-emitter@2.1.0:
+    resolution: {integrity: sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==}
+
   tinyglobby@0.2.17:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
     engines: {node: '>=12.0.0'}
@@ -6872,6 +6883,9 @@ packages:
   universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
+
+  unleash-proxy-client@3.8.2:
+    resolution: {integrity: sha512-xwFk4Zq7mdZxWU69g9On1TT3VSARBm2c+U1oY6PbaBA+FZrODpUHw7xMhIg74Ai56w0RlPMZ4znzHZ3R9PBGpA==}
 
   unpipe@1.0.0:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
@@ -10146,11 +10160,16 @@ snapshots:
 
   '@tn4consulting/shared-content-client@0.3.0': {}
 
+  '@tn4consulting/shared-feature-flags@0.1.0(react@19.2.8)':
+    dependencies:
+      react: 19.2.8
+      unleash-proxy-client: 3.8.2
+
   '@tn4consulting/shared-federation-config@0.7.0(@softarc/native-federation@4.3.2(typescript@6.0.3))':
     dependencies:
       '@softarc/native-federation': 4.3.2(typescript@6.0.3)
 
-  '@tn4consulting/shared-federation-runtime@1.0.2(react@19.2.8)':
+  '@tn4consulting/shared-federation-runtime@2.0.0(react@19.2.8)':
     dependencies:
       react: 19.2.8
 
@@ -10172,9 +10191,10 @@ snapshots:
       - '@opentelemetry/core'
       - supports-color
 
-  '@tn4consulting/shared-observability@0.1.1':
+  '@tn4consulting/shared-observability@0.2.0':
     dependencies:
       '@opentelemetry/api': 1.9.1
+      '@opentelemetry/core': 2.10.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/exporter-metrics-otlp-http': 0.221.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/exporter-trace-otlp-http': 0.221.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/instrumentation': 0.221.0(@opentelemetry/api@1.9.1)
@@ -10187,7 +10207,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tn4consulting/shared-platform-standards@0.1.0': {}
+  '@tn4consulting/shared-platform-standards@0.2.0': {}
 
   '@tn4consulting/shared-runtime-config@0.1.4': {}
 
@@ -14972,6 +14992,8 @@ snapshots:
       glob: 7.2.3
       minimatch: 3.1.5
 
+  tiny-emitter@2.1.0: {}
+
   tinyglobby@0.2.17:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.5)
@@ -15167,6 +15189,10 @@ snapshots:
 
   universalify@2.0.1:
     optional: true
+
+  unleash-proxy-client@3.8.2:
+    dependencies:
+      tiny-emitter: 2.1.0
 
   unpipe@1.0.0: {}
 
