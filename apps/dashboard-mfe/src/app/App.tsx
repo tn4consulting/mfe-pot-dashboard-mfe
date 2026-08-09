@@ -98,12 +98,12 @@ export function App() {
             <p>{intro.body}</p>
           </>
         ) : introLoadError ? (
-          <p role="alert">Page content is temporarily unavailable.</p>
+          <p role="alert">{t('errors.contentUnavailable')}</p>
         ) : null}
         <p>{t('chrome.servedFrom')}</p>
       </section>
 
-      <Overview />
+      <Overview contentClient={config.contentClient} />
     </>
   );
 }

@@ -3,6 +3,13 @@
     "title": "Welcome to your account",
     "body": "Here is an overview of your benefits and payments."
   },
+  "dashboard.overview.breadcrumbHome": { "title": "Home", "body": "" },
+  "dashboard.overview.breadcrumbDashboard": { "title": "Dashboard", "body": "" },
+  "dashboard.overview.greeting": { "title": "Hello", "body": "" },
+  "dashboard.overview.greetingWithName": { "title": "Hello, {name}", "body": "" },
+  "dashboard.overview.whatsNewHeading": { "title": "What's New?", "body": "" },
+  "dashboard.overview.needsAttentionHeading": { "title": "Needs Attention", "body": "" },
+  "dashboard.overview.considerThisHeading": { "title": "Consider this...", "body": "" },
   "dashboard.payment-history.heading": { "title": "Payments Activity", "body": "" },
   "dashboard.payment-history.table.program": { "title": "Program", "body": "" },
   "dashboard.payment-history.table.status": { "title": "Status", "body": "" },

@@ -30,6 +30,13 @@ const getPageContentsMock = jest.fn().mockResolvedValue({
   'dashboard.payment-history.status.pending': { title: 'Pending', body: '' },
   'dashboard.payment-history.error': { title: 'Payment history is temporarily unavailable.', body: '' },
   'dashboard.payment-history.view-all': { title: 'View payment history', body: '' },
+  'dashboard.overview.breadcrumbHome': { title: 'Home', body: '' },
+  'dashboard.overview.breadcrumbDashboard': { title: 'Dashboard', body: '' },
+  'dashboard.overview.greeting': { title: 'Hello', body: '' },
+  'dashboard.overview.greetingWithName': { title: 'Hello, {name}', body: '' },
+  'dashboard.overview.whatsNewHeading': { title: "What's New?", body: '' },
+  'dashboard.overview.needsAttentionHeading': { title: 'Needs Attention', body: '' },
+  'dashboard.overview.considerThisHeading': { title: 'Consider this...', body: '' },
 });
 jest.mock('./content-client', () => ({
   PAYMENT_HISTORY_CONTENT_KEYS: [
@@ -45,8 +52,19 @@ jest.mock('./content-client', () => ({
     'dashboard.payment-history.error',
     'dashboard.payment-history.view-all',
   ],
+  OVERVIEW_CHROME_CONTENT_KEYS: [
+    'dashboard.overview.breadcrumbHome',
+    'dashboard.overview.breadcrumbDashboard',
+    'dashboard.overview.greeting',
+    'dashboard.overview.greetingWithName',
+    'dashboard.overview.whatsNewHeading',
+    'dashboard.overview.needsAttentionHeading',
+    'dashboard.overview.considerThisHeading',
+  ],
   createContentClient: () => ({ getPageContents: getPageContentsMock }),
 }));
+
+const overviewContentClient = { getPageContents: getPageContentsMock, getPageContent: jest.fn() };
 
 describe('Overview', () => {
   beforeEach(() => {
@@ -58,10 +76,13 @@ describe('Overview', () => {
     jest.restoreAllMocks();
   });
 
-  it('greets the signed-in citizen by name', () => {
+  it('greets the signed-in citizen by name', async () => {
     storeSession(createMockSession());
-    render(<Overview />);
+    render(<Overview contentClient={overviewContentClient} />);
 
-    expect(screen.getByText('Hello, Jordan Tremblay')).toBeInTheDocument();
+    // Content resolution is always asynchronous, even against this mock --
+    // see mfe-pot-platform/CLAUDE.md's i18n section on why this must be
+    // findByText, not a synchronous getByText.
+    expect(await screen.findByText('Hello, Jordan Tremblay')).toBeInTheDocument();
   });
 });

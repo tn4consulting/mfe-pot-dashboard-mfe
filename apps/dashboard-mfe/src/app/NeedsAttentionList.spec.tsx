@@ -6,7 +6,7 @@ jest.mock('./register-scds', () => ({}));
 
 describe('NeedsAttentionList', () => {
   it('renders the English copy as a scds-card with the item severity as tone', () => {
-    render(<NeedsAttentionList locale="en" />);
+    render(<NeedsAttentionList locale="en" heading="Needs Attention" />);
 
     // scds-card is an unregistered custom element in this test
     // environment -- its title/tone props land as plain attributes,
@@ -21,7 +21,7 @@ describe('NeedsAttentionList', () => {
   });
 
   it('renders the French copy when locale is fr', () => {
-    render(<NeedsAttentionList locale="fr" />);
+    render(<NeedsAttentionList locale="fr" heading="Nécessite une attention" />);
 
     const card = screen
       .getByText('Ajoutez une deuxième méthode de connexion pour mieux protéger votre compte.')

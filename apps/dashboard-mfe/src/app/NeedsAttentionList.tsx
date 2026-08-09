@@ -66,14 +66,14 @@ function text(value: BilingualText, locale: Locale): string {
   return locale === 'fr' ? value.fr : value.en;
 }
 
-export function NeedsAttentionList({ locale }: { locale: Locale }) {
+export function NeedsAttentionList({ locale, heading }: { locale: Locale; heading: string }) {
   return (
     <section
       className="needs-attention-list"
       style={{ display: 'flex', flexDirection: 'column', gap: 'var(--scds-space-3)' }}
     >
       <scds-heading tag="h2" id="needs-attention-heading">
-        Needs Attention
+        {heading}
       </scds-heading>
       {NEEDS_ATTENTION.map((item) => (
         <scds-card

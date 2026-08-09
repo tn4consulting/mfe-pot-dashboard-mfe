@@ -43,11 +43,11 @@ function text(value: BilingualText, locale: Locale): string {
   return locale === 'fr' ? value.fr : value.en;
 }
 
-export function WhatsNewList({ locale }: { locale: Locale }) {
+export function WhatsNewList({ locale, heading }: { locale: Locale; heading: string }) {
   return (
     <section className="whats-new-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--scds-space-3)' }}>
       <scds-heading tag="h2" id="whats-new-heading">
-        What&apos;s New?
+        {heading}
       </scds-heading>
       {WHATS_NEW.map((item) => (
         <scds-notice key={item.id} notice-title={text(item.title, locale)} tone="info" title-tag="h3">

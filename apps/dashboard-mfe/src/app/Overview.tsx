@@ -3,11 +3,19 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { getStoredSession, onSessionChange } from '@tn4consulting/shared-auth/core';
+import type { ContentClient } from '@tn4consulting/shared-content-client';
+import { fillTemplate } from '@tn4consulting/shared-content-client';
 import { useLocale } from '@tn4consulting/shared-i18n';
+import { OVERVIEW_CHROME_CONTENT_KEYS } from './content-client';
+import { usePageContents } from './use-page-contents';
 import { WhatsNewList } from './WhatsNewList';
 import { NeedsAttentionList } from './NeedsAttentionList';
 import { ConsiderThisList } from './ConsiderThisList';
 import { DashboardFeaturePaymentHistory } from './PaymentHistory';
+
+export interface OverviewProps {
+  contentClient: ContentClient;
+}
 
 /**
  * Composes dashboard's own sections only -- WhatsNewList/NeedsAttentionList/
@@ -31,20 +39,24 @@ import { DashboardFeaturePaymentHistory } from './PaymentHistory';
  * (still there, still exercised by dashboard-bff's own tests, just no
  * longer consumed by this page).
  */
-export function Overview() {
+export function Overview({ contentClient }: OverviewProps) {
   const [citizenName, setCitizenName] = useState(() => getStoredSession()?.name ?? null);
   const locale = useLocale();
   const formattedDate = new Intl.DateTimeFormat(locale === 'fr' ? 'fr-CA' : 'en-CA', { dateStyle: 'long' }).format(
     new Date(),
   );
+  const content = usePageContents(contentClient, OVERVIEW_CHROME_CONTENT_KEYS, locale);
+  function label(key: (typeof OVERVIEW_CHROME_CONTENT_KEYS)[number]): string {
+    return content[key]?.title ?? key;
+  }
 
   useEffect(() => onSessionChange((session) => setCitizenName(session?.name ?? null)), []);
 
   return (
     <section className="dashboard-overview" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--scds-space-6)', paddingBlock: 'var(--scds-space-5)' }}>
       <scds-breadcrumbs>
-        <scds-breadcrumbs-item href="/">Home</scds-breadcrumbs-item>
-        <scds-breadcrumbs-item>Dashboard</scds-breadcrumbs-item>
+        <scds-breadcrumbs-item href="/">{label('dashboard.overview.breadcrumbHome')}</scds-breadcrumbs-item>
+        <scds-breadcrumbs-item>{label('dashboard.overview.breadcrumbDashboard')}</scds-breadcrumbs-item>
       </scds-breadcrumbs>
 
       {/* Inline styles, not a stylesheet class, for every layout-critical
@@ -69,20 +81,24 @@ export function Overview() {
           borderBottom: '1px solid var(--scds-border-color)',
         }}
       >
-        <scds-heading tag="h1">{citizenName ? `Hello, ${citizenName}` : 'Hello'}</scds-heading>
+        <scds-heading tag="h1">
+          {citizenName
+            ? fillTemplate(label('dashboard.overview.greetingWithName'), { name: citizenName })
+            : label('dashboard.overview.greeting')}
+        </scds-heading>
         <p className="today" style={{ color: 'var(--scds-color-text-muted)', margin: 0 }}>
           {formattedDate}
         </p>
       </div>
 
-      <WhatsNewList locale={locale} />
+      <WhatsNewList locale={locale} heading={label('dashboard.overview.whatsNewHeading')} />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(22rem, 1fr))', gap: 'var(--scds-space-5)', alignItems: 'start' }}>
-        <NeedsAttentionList locale={locale} />
+        <NeedsAttentionList locale={locale} heading={label('dashboard.overview.needsAttentionHeading')} />
         <DashboardFeaturePaymentHistory />
       </div>
 
-      <ConsiderThisList locale={locale} />
+      <ConsiderThisList locale={locale} heading={label('dashboard.overview.considerThisHeading')} />
     </section>
   );
 }

@@ -5,5 +5,8 @@
   },
   "auth": {
     "signInRequired": "You need to sign in to view your dashboard."
+  },
+  "errors": {
+    "contentUnavailable": "Page content is temporarily unavailable."
   }
 }

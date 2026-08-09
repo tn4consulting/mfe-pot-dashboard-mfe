@@ -4,7 +4,7 @@ import { WhatsNewList } from './WhatsNewList';
 
 describe('WhatsNewList', () => {
   it('renders the English copy by default', () => {
-    render(<WhatsNewList locale="en" />);
+    render(<WhatsNewList locale="en" heading="What's New?" />);
 
     // scds-notice is an unregistered custom element in this test
     // environment -- its `notice-title` prop lands as a plain attribute
@@ -18,7 +18,7 @@ describe('WhatsNewList', () => {
   });
 
   it('renders the French copy when locale is fr', () => {
-    render(<WhatsNewList locale="fr" />);
+    render(<WhatsNewList locale="fr" heading="Quoi de neuf?" />);
 
     const notice = screen.getByText(
       "Ceci est un message de test d'Emploi et Développement social Canada (EDSC). Aucune mesure n'est requise.",

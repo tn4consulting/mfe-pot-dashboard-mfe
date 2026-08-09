@@ -47,11 +47,11 @@ function text(value: BilingualText, locale: Locale): string {
   return locale === 'fr' ? value.fr : value.en;
 }
 
-export function ConsiderThisList({ locale }: { locale: Locale }) {
+export function ConsiderThisList({ locale, heading }: { locale: Locale; heading: string }) {
   return (
     <section className="consider-this-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--scds-space-3)' }}>
       <scds-heading tag="h2" id="consider-this-heading">
-        Consider this...
+        {heading}
       </scds-heading>
       {SUGGESTIONS.map((item) => (
         <scds-card key={item.id} card-title={text(item.title, locale)}>

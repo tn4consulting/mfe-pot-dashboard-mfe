@@ -27,6 +27,15 @@ jest.mock('./content-client', () => ({
     'dashboard.payment-history.error',
     'dashboard.payment-history.view-all',
   ],
+  OVERVIEW_CHROME_CONTENT_KEYS: [
+    'dashboard.overview.breadcrumbHome',
+    'dashboard.overview.breadcrumbDashboard',
+    'dashboard.overview.greeting',
+    'dashboard.overview.greetingWithName',
+    'dashboard.overview.whatsNewHeading',
+    'dashboard.overview.needsAttentionHeading',
+    'dashboard.overview.considerThisHeading',
+  ],
   createContentClient: () => ({ getPageContent: getPageContentMock, getPageContents: getPageContentsMock }),
 }));
 
@@ -45,6 +54,13 @@ describe('App', () => {
       'dashboard.payment-history.status.pending': { title: 'Pending', body: '' },
       'dashboard.payment-history.error': { title: 'Payment history is temporarily unavailable.', body: '' },
       'dashboard.payment-history.view-all': { title: 'View payment history', body: '' },
+      'dashboard.overview.breadcrumbHome': { title: 'Home', body: '' },
+      'dashboard.overview.breadcrumbDashboard': { title: 'Dashboard', body: '' },
+      'dashboard.overview.greeting': { title: 'Hello', body: '' },
+      'dashboard.overview.greetingWithName': { title: 'Hello, {name}', body: '' },
+      'dashboard.overview.whatsNewHeading': { title: "What's New?", body: '' },
+      'dashboard.overview.needsAttentionHeading': { title: 'Needs Attention', body: '' },
+      'dashboard.overview.considerThisHeading': { title: 'Consider this...', body: '' },
     });
     global.fetch = jest.fn((url: RequestInfo | URL) => {
       if (url.toString().includes('/api/payments')) {

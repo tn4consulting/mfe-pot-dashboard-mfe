@@ -3,6 +3,13 @@
     "title": "Bienvenue dans votre compte",
     "body": "Voici un aperçu de vos prestations et paiements."
   },
+  "dashboard.overview.breadcrumbHome": { "title": "Accueil", "body": "" },
+  "dashboard.overview.breadcrumbDashboard": { "title": "Tableau de bord", "body": "" },
+  "dashboard.overview.greeting": { "title": "Bonjour", "body": "" },
+  "dashboard.overview.greetingWithName": { "title": "Bonjour, {name}", "body": "" },
+  "dashboard.overview.whatsNewHeading": { "title": "Quoi de neuf?", "body": "" },
+  "dashboard.overview.needsAttentionHeading": { "title": "Nécessite une attention", "body": "" },
+  "dashboard.overview.considerThisHeading": { "title": "À considérer...", "body": "" },
   "dashboard.payment-history.heading": { "title": "Activité des paiements", "body": "" },
   "dashboard.payment-history.table.program": { "title": "Programme", "body": "" },
   "dashboard.payment-history.table.status": { "title": "État", "body": "" },

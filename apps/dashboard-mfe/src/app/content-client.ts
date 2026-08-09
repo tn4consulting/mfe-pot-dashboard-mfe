@@ -7,6 +7,16 @@ import {
 
 export const OVERVIEW_CONTENT_KEY = 'dashboard.overview.intro';
 
+export const OVERVIEW_CHROME_CONTENT_KEYS = [
+  'dashboard.overview.breadcrumbHome',
+  'dashboard.overview.breadcrumbDashboard',
+  'dashboard.overview.greeting',
+  'dashboard.overview.greetingWithName',
+  'dashboard.overview.whatsNewHeading',
+  'dashboard.overview.needsAttentionHeading',
+  'dashboard.overview.considerThisHeading',
+] as const;
+
 export const PAYMENT_HISTORY_CONTENT_KEYS = [
   'dashboard.payment-history.heading',
   'dashboard.payment-history.table.program',

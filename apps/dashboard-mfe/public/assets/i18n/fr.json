@@ -5,5 +5,8 @@
   },
   "auth": {
     "signInRequired": "Vous devez ouvrir une session pour consulter votre tableau de bord."
+  },
+  "errors": {
+    "contentUnavailable": "Le contenu de la page est temporairement indisponible."
   }
 }
