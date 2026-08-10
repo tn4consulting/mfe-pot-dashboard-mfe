@@ -6,6 +6,9 @@ const mockGetCorrespondence = jest.fn();
 jest.mock('./data', () => ({
   getPayments: (sub: string) => mockGetPayments(sub),
   getCorrespondence: (sub: string) => mockGetCorrespondence(sub),
+  // Real implementation, not a jest.fn() -- this endpoint's own tests below
+  // want the actual control/updated-message lookup behavior, not a mock.
+  getWhatsNewMessage: jest.requireActual('./data').getWhatsNewMessage,
 }));
 
 // The real JWKS-based JWT verification and the whoami response shape are
@@ -72,6 +75,24 @@ describe('dashboard-bff', () => {
     const res = await request(app).get('/api/correspondence').query({ sub: 'mock-citizen-001' });
     expect(res.status).toBe(200);
     expect(res.body).toEqual([{ id: 'corr-1', date: '2026-07-10', subject: 'Your EI application has been approved' }]);
+  });
+
+  it('returns the control What\'s New variant when no Unleash flag is configured (StaticFeatureFlags default)', async () => {
+    const res = await request(app).get('/api/whats-new').query({ sub: 'mock-citizen-001' });
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ variant: 'control', id: 'whats-new-esdc-test-message' });
+  });
+
+  it('returns the control What\'s New variant even without a sub query parameter', async () => {
+    const res = await request(app).get('/api/whats-new');
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ variant: 'control' });
+  });
+
+  it('accepts a sessionId query parameter too (what the Unleash flag is actually keyed on)', async () => {
+    const res = await request(app).get('/api/whats-new').query({ sessionId: 'tab-abc-123' });
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ variant: 'control' });
   });
 
   it('returns the verified identity with a masked SIN for /api/whoami', async () => {

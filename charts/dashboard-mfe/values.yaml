@@ -89,6 +89,15 @@ backend:
     # pattern as REDIS_URL above -- identical on kind and EKS.
     OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.default.svc.cluster.local:4318"
     OTEL_SERVICE_NAME: "dashboard-bff"
+    # Unleash's own release in mfe-pot-platform (see its charts/unleash),
+    # same cross-Helm-release in-cluster Service DNS pattern as REDIS_URL/
+    # OTEL_EXPORTER_OTLP_ENDPOINT above -- identical on kind and EKS. This
+    # is a CLIENT-type token (server SDK, /api/client), not the
+    # FRONTEND-type token frontend.runtimeConfig.unleashFrontendApiToken
+    # above uses -- see charts/unleash/values.yaml's own comment on why
+    # they aren't interchangeable.
+    UNLEASH_URL: "http://unleash.default.svc.cluster.local:4242"
+    UNLEASH_CLIENT_API_TOKEN: "*:development.unleash-demo-client-token"
 
 ingress:
   host: dashboard-mfe.mfe-pot.local

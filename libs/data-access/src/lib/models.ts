@@ -6,3 +6,16 @@ export interface Payment {
   status: 'pending' | 'complete';
   amount: number;
 }
+
+export interface BilingualText {
+  en: string;
+  fr: string;
+}
+
+export interface WhatsNewMessage {
+  id: string;
+  /** Which Unleash variant (dashboard-bff's dashboard-whats-new-message flag) produced this message. */
+  variant: string;
+  title: BilingualText;
+  body: BilingualText;
+}

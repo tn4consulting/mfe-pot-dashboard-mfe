@@ -1,8 +1,11 @@
 import cors from 'cors';
 import express, { Express } from 'express';
+import { trace } from '@opentelemetry/api';
 import { verifyBearerToken, whoamiHandler } from '@tn4consulting/shared-auth-server';
-import { mockIdp, sessionCache } from './config';
-import { getCorrespondence, getPayments } from './data';
+import { featureFlags, mockIdp, sessionCache } from './config';
+import { getCorrespondence, getPayments, getWhatsNewMessage } from './data';
+
+const WHATS_NEW_FLAG_KEY = 'dashboard-whats-new-message';
 
 /**
  * MSCA-D's own BFF: serves its own local payments/correspondence data
@@ -60,6 +63,37 @@ export function createApp(): Express {
       return;
     }
     res.json(await getCorrespondence(sub));
+  });
+
+  // Server-side Unleash consumer -- see config.ts's `featureFlags` for why
+  // this is the first BFF in the family to actually instantiate
+  // UnleashFeatureFlags (mfe-pot-platform/CLAUDE.md's "Design principles"
+  // section documents the flag mechanism; nothing server-side used it
+  // until now). Both `sub`/`sessionId` are optional, unlike /api/payments
+  // above -- they're only used for the flag's rollout stickiness, not data
+  // ownership, so an anonymous/no-session request still gets a (randomly
+  // assigned, non-sticky) variant instead of a 400. `sessionId` (not
+  // `sub`) is what the flag's own strategy is actually keyed on -- see
+  // mfe-pot-platform's seed-unleash-flags.mjs comment: this PoT has one
+  // seeded mock persona, so `sub`-keyed stickiness would always resolve to
+  // the same variant every demo run. `sub` is still forwarded for future
+  // multi-persona targeting. The span attributes follow OTel's own
+  // feature-flag semantic convention (feature_flag.key/variant/
+  // provider.name) so this request's trace is filterable/comparable by
+  // variant in Grafana/Tempo without a family-specific naming scheme.
+  app.get('/api/whats-new', async (req, res) => {
+    const sub = req.query['sub'];
+    const sessionId = req.query['sessionId'];
+    const context = {
+      ...(typeof sub === 'string' ? { userId: sub } : {}),
+      ...(typeof sessionId === 'string' ? { sessionId } : {}),
+    };
+    const variant = await featureFlags.getVariant(WHATS_NEW_FLAG_KEY, context);
+    const span = trace.getActiveSpan();
+    span?.setAttribute('feature_flag.key', WHATS_NEW_FLAG_KEY);
+    span?.setAttribute('feature_flag.variant', variant?.name ?? 'control');
+    span?.setAttribute('feature_flag.provider.name', 'unleash');
+    res.json(getWhatsNewMessage(variant?.name));
   });
 
   // Proves identity (including the SIN custom claim) actually propagated

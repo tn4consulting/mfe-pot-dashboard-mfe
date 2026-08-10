@@ -78,9 +78,25 @@ jest.mock('./content-client', () => ({
 
 const overviewContentClient = { getPageContents: getPageContentsMock, getPageContent: jest.fn() };
 
+const WHATS_NEW_MESSAGE = {
+  id: 'whats-new-esdc-test-message',
+  variant: 'control',
+  title: { en: 'ESDC test message', fr: 'Message de test d’EDSC' },
+  body: { en: 'This is a test message.', fr: 'Ceci est un message de test.' },
+};
+
 describe('Overview', () => {
   beforeEach(() => {
-    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve([]) }) as unknown as typeof fetch;
+    // WhatsNewList (rendered unconditionally, see Overview.tsx) now fetches
+    // its own message from dashboard-bff's /api/whats-new -- a different
+    // response shape than every other endpoint this generic mock backs
+    // (payments/correspondence, all plain arrays), so it's routed by URL.
+    global.fetch = jest.fn((url: RequestInfo | URL) => {
+      if (url.toString().includes('/api/whats-new')) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(WHATS_NEW_MESSAGE) } as Response);
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) } as Response);
+    }) as unknown as typeof fetch;
   });
 
   afterEach(() => {
